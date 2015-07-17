@@ -65,23 +65,23 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	__webpack_require__(1);
+	__webpack_require__(5);
+	__webpack_require__(7);
+	__webpack_require__(9);
+	__webpack_require__(11);
 	__webpack_require__(13);
 	__webpack_require__(15);
 	__webpack_require__(17);
 	__webpack_require__(19);
 	__webpack_require__(21);
 	__webpack_require__(23);
-	__webpack_require__(1);
-	__webpack_require__(5);
-	__webpack_require__(7);
-	__webpack_require__(9);
-	__webpack_require__(11);
 	module.exports = __webpack_require__(25);
 
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
@@ -90,70 +90,70 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */,
 /* 4 */,
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 6 */,
 /* 7 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 8 */,
 /* 9 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 10 */,
 /* 11 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 12 */,
 /* 13 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 14 */,
 /* 15 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 16 */,
 /* 17 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 18 */,
 /* 19 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 20 */,
 /* 21 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
 /***/ },
 /* 22 */,
 /* 23 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// removed by extract-text-webpack-plugin
 
@@ -489,9 +489,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	  },
 
+	  getViewportHeightFromProps: function getViewportHeightFromProps( /*object*/props) /*number*/{
+	    var totalHeight = props.height === undefined ? props.maxHeight : props.height;
+
+	    if (props.ownerHeight) {
+	      totalHeight = Math.min(props.ownerHeight, totalHeight);
+	    }
+
+	    var viewportHeight = totalHeight - (props.headerHeight || 0) - (props.footerHeight || 0) - (props.groupHeaderHeight || 0);
+
+	    return viewportHeight;
+	  },
+
 	  getInitialState: function getInitialState() /*object*/{
 	    var props = this.props;
-	    var viewportHeight = (props.height === undefined ? props.maxHeight : props.height) - (props.headerHeight || 0) - (props.footerHeight || 0) - (props.groupHeaderHeight || 0);
+	    var viewportHeight = this.getViewportHeightFromProps(props);
 	    this._scrollHelper = new FixedDataTableScrollHelper(props.rowsCount, props.rowHeight, viewportHeight, props.rowHeightGetter);
 	    if (props.scrollTop) {
 	      this._scrollHelper.scrollTo(props.scrollTop);
@@ -908,7 +920,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (oldState && props.rowsCount !== oldState.rowsCount) {
 	      // Number of rows changed, try to scroll to the row from before the
 	      // change
-	      var viewportHeight = (props.height === undefined ? props.maxHeight : props.height) - (props.headerHeight || 0) - (props.footerHeight || 0) - (props.groupHeaderHeight || 0);
+	      var viewportHeight = this.getViewportHeightFromProps(props);
 	      this._scrollHelper = new FixedDataTableScrollHelper(props.rowsCount, props.rowHeight, viewportHeight, props.rowHeightGetter);
 	      var scrollState = this._scrollHelper.scrollToRow(firstRowIndex, firstRowOffset);
 	      firstRowIndex = scrollState.index;
@@ -973,6 +985,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var useMaxHeight = props.height === undefined;
 	    var height = Math.round(useMaxHeight ? props.maxHeight : props.height);
+	    if (props.ownerHeight) {
+	      height = Math.min(props.ownerHeight, height);
+	    }
+
 	    var totalHeightReserved = props.footerHeight + props.headerHeight + groupHeaderHeight + 2 * BORDER_HEIGHT;
 	    var bodyHeight = height - totalHeightReserved;
 	    var scrollContentHeight = this._scrollHelper.getContentHeight();
@@ -1143,6 +1159,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          scrollContentHeight: scrollState.contentHeight,
 	          maxScrollY: maxScrollY
 	        });
+	        if (this.props.onScroll) {
+	          this.props.onScroll(this.state.scrollX, scrollState.position);
+	        }
 	      } else if (deltaX && this.props.overflowX !== 'hidden') {
 	        x += deltaX;
 	        x = x < 0 ? 0 : x;
@@ -1150,6 +1169,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        this.setState({
 	          scrollX: x
 	        });
+	        if (this.props.onScroll) {
+	          this.props.onScroll(x, this.state.scrollY);
+	        }
 	      }
 
 	      this._didScrollStop();
@@ -1164,6 +1186,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this.setState({
 	        scrollX: scrollPos
 	      });
+	      if (this.props.onScroll) {
+	        this.props.onScroll(scrollPos, this.state.scrollY);
+	      }
 	      this._didScrollStop();
 	    }
 	  },
@@ -1180,6 +1205,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        scrollY: scrollState.position,
 	        scrollContentHeight: scrollState.contentHeight
 	      });
+	      if (this.props.onScroll) {
+	        this.props.onScroll(this.state.scrollX, scrollState.position);
+	      }
 	      this._didScrollStop();
 	    }
 	  },
@@ -1411,7 +1439,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 29 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_29__;
 
@@ -1498,7 +1526,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 32 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	// shim for using process in browser
 
@@ -1986,7 +2014,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 35 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright 2014-2015, Facebook, Inc.
@@ -2132,7 +2160,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 38 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright 2013-2015, Facebook, Inc.
@@ -2170,7 +2198,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 39 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright 2013-2015, Facebook, Inc.
@@ -2322,7 +2350,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 41 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright 2013-2015, Facebook, Inc.
@@ -2367,7 +2395,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 42 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright 2013-2015, Facebook, Inc.
@@ -2519,7 +2547,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 44 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -2900,7 +2928,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 49 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright 2013-2015, Facebook, Inc.
@@ -3058,7 +3086,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 51 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -3302,7 +3330,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 53 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright 2004-present Facebook. All Rights Reserved.
@@ -3650,7 +3678,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 55 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -3734,7 +3762,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 57 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -3969,7 +3997,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return UNSCROLLABLE_STATE;
 	    }
 
-	    var stateKey = '' + position + '_' + size + '_' + contentSize + '_' + orientation;
+	    var stateKey = position + '_' + size + '_' + contentSize + '_' + orientation;
 	    if (this._stateKey === stateKey) {
 	      return this._stateForKey;
 	    }
@@ -4453,7 +4481,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 61 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -4479,7 +4507,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 62 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -4521,7 +4549,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 63 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -4566,7 +4594,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 64 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -4787,7 +4815,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 68 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -5352,7 +5380,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 73 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -5535,7 +5563,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 74 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -6091,7 +6119,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
 
-	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
+	var _get = function get(_x, _x2, _x3) { var _again = true; _function: while (_again) { var object = _x, property = _x2, receiver = _x3; desc = parent = getter = undefined; _again = false; if (object === null) object = Function.prototype; var desc = Object.getOwnPropertyDescriptor(object, property); if (desc === undefined) { var parent = Object.getPrototypeOf(object); if (parent === null) { return undefined; } else { _x = parent; _x2 = property; _x3 = receiver; _again = true; continue _function; } } else if ('value' in desc) { return desc.value; } else { var getter = desc.get; if (getter === undefined) { return undefined; } return getter.call(receiver); } } };
 
 	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
@@ -6123,6 +6151,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 
 	var ImmutableObject = (function (_ImmutableValue) {
+	  _inherits(ImmutableObject, _ImmutableValue);
+
 	  /**
 	   * @arguments {array<object>} The arguments is an array of objects that, when
 	   * merged together, will form the immutable objects.
@@ -6137,8 +6167,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      ImmutableValue.deepFreezeRootNode(this);
 	    }
 	  }
-
-	  _inherits(ImmutableObject, _ImmutableValue);
 
 	  _createClass(ImmutableObject, null, [{
 	    key: 'create',
@@ -6426,7 +6454,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 79 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -6454,7 +6482,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 80 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -6876,7 +6904,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 84 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -7392,18 +7420,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 87 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/**
-	 * Copyright (c) 2015, Facebook, Inc.
-	 * All rights reserved.
-	 *
-	 * This source code is licensed under the BSD-style license found in the
-	 * LICENSE file in the root directory of this source tree. An additional grant
-	 * of patent rights can be found in the PATENTS file in the same directory.
-	 *
-	 * @providesModule PrefixIntervalTree
-	 * @flow
-	 * @typechecks
-	 */
+	/* WEBPACK VAR INJECTION */(function(global) {
 
 	'use strict';
 
@@ -7654,7 +7671,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 88 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.
@@ -7726,7 +7743,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 89 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	/**
 	 * Copyright (c) 2015, Facebook, Inc.

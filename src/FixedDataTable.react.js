@@ -291,13 +291,26 @@ var FixedDataTable = React.createClass({
     };
   },
 
-  getInitialState() /*object*/ {
-    var props = this.props;
-    var viewportHeight =
-      (props.height === undefined ? props.maxHeight : props.height) -
+  getViewportHeightFromProps(/*object*/ props) /*number*/ {
+    var totalHeight = (props.height === undefined ? props.maxHeight : props.height);
+
+    if (props.ownerHeight) {
+      totalHeight = Math.min(props.ownerHeight, totalHeight)
+    }
+
+    var viewportHeight = (
+      totalHeight -
       (props.headerHeight || 0) -
       (props.footerHeight || 0) -
-      (props.groupHeaderHeight || 0);
+      (props.groupHeaderHeight || 0)
+    );
+
+    return viewportHeight;
+  },
+
+  getInitialState() /*object*/ {
+    var props = this.props;
+    var viewportHeight = this.getViewportHeightFromProps(props);
     this._scrollHelper = new FixedDataTableScrollHelper(
       props.rowsCount,
       props.rowHeight,
@@ -801,11 +814,7 @@ var FixedDataTable = React.createClass({
     if (oldState && props.rowsCount !== oldState.rowsCount) {
       // Number of rows changed, try to scroll to the row from before the
       // change
-      var viewportHeight =
-        (props.height === undefined ? props.maxHeight : props.height) -
-        (props.headerHeight || 0) -
-        (props.footerHeight || 0) -
-        (props.groupHeaderHeight || 0);
+      var viewportHeight = this.getViewportHeightFromProps(props);
       this._scrollHelper = new FixedDataTableScrollHelper(
         props.rowsCount,
         props.rowHeight,
@@ -890,6 +899,10 @@ var FixedDataTable = React.createClass({
 
     var useMaxHeight = props.height === undefined;
     var height = Math.round(useMaxHeight ? props.maxHeight : props.height);
+    if (props.ownerHeight) {
+      height = Math.min(props.ownerHeight, height);
+    }
+
     var totalHeightReserved = props.footerHeight + props.headerHeight +
       groupHeaderHeight + 2 * BORDER_HEIGHT;
     var bodyHeight = height - totalHeightReserved;
@@ -1090,6 +1103,9 @@ var FixedDataTable = React.createClass({
           scrollContentHeight: scrollState.contentHeight,
           maxScrollY: maxScrollY,
         });
+        if (this.props.onScroll) {
+          this.props.onScroll(this.state.scrollX, scrollState.position);
+        }
       } else if (deltaX && this.props.overflowX !== 'hidden') {
         x += deltaX;
         x = x < 0 ? 0 : x;
@@ -1097,6 +1113,9 @@ var FixedDataTable = React.createClass({
         this.setState({
           scrollX: x,
         });
+        if (this.props.onScroll) {
+          this.props.onScroll(x, this.state.scrollY);
+        }
       }
 
       this._didScrollStop();
@@ -1112,6 +1131,9 @@ var FixedDataTable = React.createClass({
       this.setState({
         scrollX: scrollPos,
       });
+      if (this.props.onScroll) {
+        this.props.onScroll(scrollPos, this.state.scrollY);
+      }
       this._didScrollStop();
     }
   },
@@ -1128,6 +1150,9 @@ var FixedDataTable = React.createClass({
         scrollY: scrollState.position,
         scrollContentHeight: scrollState.contentHeight,
       });
+      if (this.props.onScroll) {
+        this.props.onScroll(this.state.scrollX, scrollState.position);
+      }
       this._didScrollStop();
     }
   },
