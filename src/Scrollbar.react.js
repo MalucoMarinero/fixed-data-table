@@ -266,7 +266,7 @@ var Scrollbar = React.createClass({
     var maxPosition = contentSize - size;
 
     if (position < 0) {
-      position = 0;
+      // position = 0;
     } else if (position > maxPosition) {
       position = maxPosition;
     }

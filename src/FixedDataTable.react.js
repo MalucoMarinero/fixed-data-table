@@ -352,6 +352,7 @@ var FixedDataTable = React.createClass({
     }
 
     return(
+      !!this.props.beforeScroll ||
       (delta < 0 && this.state.scrollX > 0) ||
       (delta >= 0 && this.state.scrollX < this.state.maxScrollX)
     );
@@ -368,6 +369,7 @@ var FixedDataTable = React.createClass({
     }
 
     return(
+      !!this.props.beforeScroll ||
       (delta < 0 && this.state.scrollY > 0) ||
       (delta >= 0 && this.state.scrollY < this.state.maxScrollY)
     );
@@ -1091,6 +1093,15 @@ var FixedDataTable = React.createClass({
       var x = this.state.scrollX;
       if (Math.abs(deltaY) > Math.abs(deltaX) &&
           this.props.overflowY !== 'hidden') {
+
+        if (this.props.beforeScroll) {
+          var res = this.props.beforeScroll(
+            x, x,
+            this.state.scrollY, this.state.scrollY + Math.round(deltaY)
+          );
+          if (!res) return;
+        }
+
         var scrollState = this._scrollHelper.scrollBy(Math.round(deltaY));
         var maxScrollY = Math.max(
           0,
@@ -1107,6 +1118,14 @@ var FixedDataTable = React.createClass({
           this.props.onScroll(this.state.scrollX, scrollState.position);
         }
       } else if (deltaX && this.props.overflowX !== 'hidden') {
+        if (this.props.beforeScroll) {
+          var res = this.props.beforeScroll(
+            x, x + deltaX,
+            this.state.scrollY, this.state.scrollY
+          );
+          if (!res) return;
+        }
+
         x += deltaX;
         x = x < 0 ? 0 : x;
         x = x > this.state.maxScrollX ? this.state.maxScrollX : x;
@@ -1128,6 +1147,13 @@ var FixedDataTable = React.createClass({
       if (!this._isScrolling) {
         this._didScrollStart();
       }
+      if (this.props.beforeScroll) {
+        var res = this.props.beforeScroll(
+          this.state.scrollX, scrollPos,
+          this.state.scrollY, this.state.scrollY
+        );
+        if (!res) return;
+      }
       this.setState({
         scrollX: scrollPos,
       });
@@ -1143,6 +1169,14 @@ var FixedDataTable = React.createClass({
       if (!this._isScrolling) {
         this._didScrollStart();
       }
+      if (this.props.beforeScroll) {
+        var res = this.props.beforeScroll(
+          this.state.scrollX, this.state.scrollX,
+          this.state.scrollY, Math.round(scrollPos)
+        );
+        if (!res) return;
+      }
+      scrollPos = scrollPos < 0 ? 0 : scrollPos;
       var scrollState = this._scrollHelper.scrollTo(Math.round(scrollPos));
       this.setState({
         firstRowIndex: scrollState.index,
