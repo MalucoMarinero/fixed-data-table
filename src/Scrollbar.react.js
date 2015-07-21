@@ -162,8 +162,7 @@ var Scrollbar = React.createClass({
         onMouseDown={this._onMouseDown}
         onWheel={this._wheelHandler.onWheel}
         className={mainClassName}
-        style={mainStyle}
-        tabIndex={0}>
+        style={mainStyle}>
         <div
           ref="face"
           className={faceClassName}
