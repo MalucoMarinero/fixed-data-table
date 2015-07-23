@@ -274,6 +274,19 @@ class FixedDataTableScrollHelper {
     }
     return this.scrollTo(this._position);
   }
+
+  getScrollRowIntoViewPosition(/*number*/ rowIndex) /*object*/ {
+    rowIndex = clamp(0, rowIndex, Math.max(this._rowCount - 1, 0));
+    var rowBegin = this._rowOffsets.sumUntil(rowIndex);
+    var rowEnd = rowBegin + this._storedHeights[rowIndex];
+    if (rowBegin < this._position) {
+      return rowBegin;
+    } else if (this._position + this._viewportHeight < rowEnd) {
+      var position = this._getRowAtEndPosition(rowIndex);
+      return position;
+    }
+    return this._position;
+  }
 }
 
 module.exports = FixedDataTableScrollHelper;

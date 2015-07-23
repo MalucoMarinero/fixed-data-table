@@ -803,12 +803,28 @@ var FixedDataTable = React.createClass({
     }
 
     if (this._rowToScrollTo !== undefined) {
-      scrollState =
-        this._scrollHelper.scrollRowIntoView(this._rowToScrollTo);
-      firstRowIndex = scrollState.index;
-      firstRowOffset = scrollState.offset;
-      scrollY = scrollState.position;
-      delete this._rowToScrollTo;
+      var doRowScroll = () => {
+        scrollState =
+          this._scrollHelper.scrollRowIntoView(this._rowToScrollTo);
+        firstRowIndex = scrollState.index;
+        firstRowOffset = scrollState.offset;
+        scrollY = scrollState.position;
+        delete this._rowToScrollTo;
+      };
+
+      if (this.props.beforeScroll) {
+        var res = this.props.beforeScroll(
+          scrollX, scrollX, scrollY,
+          this._scrollHelper.getScrollRowIntoViewPosition(this._rowToScrollTo)
+        );
+        if (res) {
+          doRowScroll();
+        } else {
+          delete this._rowToScrollTo;
+        }
+      } else {
+        doRowScroll();
+      }
     }
 
     var groupHeaderHeight = useGroupHeader ? props.groupHeaderHeight : 0;
@@ -1154,6 +1170,7 @@ var FixedDataTable = React.createClass({
         );
         if (!res) return;
       }
+      scrollPos = scrollPos < 0 ? 0 : scrollPos;
       this.setState({
         scrollX: scrollPos,
       });
