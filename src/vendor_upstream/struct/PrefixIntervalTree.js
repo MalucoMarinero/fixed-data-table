@@ -17,6 +17,12 @@ var invariant = require('invariant');
 
 var parent = node => Math.floor(node / 2);
 
+// SSRHACK - As all the other hacks in this lib, needs to be revised
+
+if (!global) {
+  global = {};
+}
+
 var Int32Array = global.Int32Array ||
   function(size: number): Array<number> {
     var xs = [];

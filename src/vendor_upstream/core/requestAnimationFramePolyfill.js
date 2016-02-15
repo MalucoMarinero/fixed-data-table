@@ -24,7 +24,9 @@ var requestAnimationFrame =
     var currTime = Date.now();
     var timeDelay = Math.max(0, 16 - (currTime - lastTime));
     lastTime = currTime + timeDelay;
-    return global.setTimeout(function() {
+    // SSRHACK - This seems harmless but could have some horrible repercussions
+    // return global.setTimeout(function() {
+    return setTimeout(function() {
       callback(Date.now());
     }, timeDelay);
   };

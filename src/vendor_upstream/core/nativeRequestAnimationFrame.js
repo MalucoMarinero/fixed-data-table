@@ -9,6 +9,11 @@
  * @providesModule nativeRequestAnimationFrame
  */
 
+// SSRHACK - This needs to be fixed I think
+if (!global) {
+  global = {};
+}
+
 var nativeRequestAnimationFrame =
   global.requestAnimationFrame       ||
   global.webkitRequestAnimationFrame ||
