@@ -505,6 +505,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return state;
 	  },
 
+	  sendWheelEvent: function sendWheelEvent(e, a, o, u, i) {
+	    this.refs.newTable.sendWheelEvent(e, a, o, u, i);
+	  },
+
 	  _checkDeprecations: function _checkDeprecations() {
 	    var needsMigration = false;
 
@@ -700,7 +704,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var props = this.props;
 	    return React.createElement(
 	      Table,
-	      _extends({}, props, {
+	      _extends({
+	        ref: 'newTable'
+	      }, props, {
 	        onRowMouseDown: this._onRowAction(props, props.onRowMouseDown),
 	        onRowClick: this._onRowAction(props, props.onRowClick),
 	        onRowDoubleClick: this._onRowAction(props, props.onRowDoubleClick),
@@ -935,6 +941,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    scrollTop: PropTypes.number,
 
 	    /**
+	     * Option to center the row content using CSS.
+	     */
+	    centerRowContent: PropTypes.bool,
+
+	    /**
 	     * Index of row to scroll to.
 	     */
 	    scrollToRow: PropTypes.number,
@@ -1130,9 +1141,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._reportContentHeight();
 	  },
 
+	  sendWheelEvent: function sendWheelEvent(e, a, o, u, i) {
+	    this._wheelHandler.onWheel(e, a, o, u, i);
+	  },
+
 	  render: function render() /*object*/{
 	    var state = this.state;
 	    var props = this.props;
+	    var renderWidth = props.centerRowContent ? "100%" : state.width;
 
 	    var groupHeader;
 	    if (state.useGroupHeader) {
@@ -1141,6 +1157,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        isScrolling: this._isScrolling,
 	        className: joinClasses(cx('fixedDataTableLayout/header'), cx('public/fixedDataTable/header')),
 	        width: state.width,
+	        renderWidth: renderWidth,
 	        height: state.groupHeaderHeight,
 	        index: 0,
 	        zIndex: 1,
@@ -1216,6 +1233,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        isScrolling: this._isScrolling,
 	        className: joinClasses(cx('fixedDataTableLayout/footer'), cx('public/fixedDataTable/footer')),
 	        width: state.width,
+	        renderWidth: renderWidth,
 	        height: state.footerHeight,
 	        index: -1,
 	        zIndex: 1,
@@ -1233,6 +1251,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      isScrolling: this._isScrolling,
 	      className: joinClasses(cx('fixedDataTableLayout/header'), cx('public/fixedDataTable/header')),
 	      width: state.width,
+	      renderWidth: renderWidth,
 	      height: state.headerHeight,
 	      index: -1,
 	      zIndex: 1,
@@ -1264,12 +1283,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      {
 	        className: joinClasses(cx('fixedDataTableLayout/main'), cx('public/fixedDataTable/main')),
 	        onWheel: this._wheelHandler.onWheel,
-	        style: { height: state.height, width: state.width } },
+	        style: { height: state.height, width: renderWidth } },
 	      React.createElement(
 	        'div',
 	        {
 	          className: cx('fixedDataTableLayout/rowsContainer'),
-	          style: { height: rowsContainerHeight, width: state.width } },
+	          style: { height: rowsContainerHeight, width: renderWidth } },
 	        dragKnob,
 	        groupHeader,
 	        header,
@@ -1285,6 +1304,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  _renderRows: function _renderRows( /*number*/offsetTop) /*object*/{
 	    var state = this.state;
+	    var renderWidth = this.props.centerRowContent ? "100%" : state.width;
 
 	    return React.createElement(FixedDataTableBufferedRows, {
 	      isScrolling: this._isScrolling,
@@ -1307,6 +1327,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      scrollableColumns: state.bodyScrollableColumns,
 	      showLastRowBorder: true,
 	      width: state.width,
+	      renderWidth: renderWidth,
 	      rowPositionGetter: this._scrollHelper.getRowPosition
 	    });
 	  },
@@ -4007,7 +4028,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    var style = {
 	      position: 'absolute',
-	      pointerEvents: props.isScrolling ? 'none' : 'auto'
+	      pointerEvents: props.isScrolling ? 'none' : 'auto',
+	      width: '100%'
 	    };
 
 	    translateDOMPositionXY(style, 0, props.firstRowOffset - firstRowPosition + props.offsetTop, this._initialRender);
@@ -4633,6 +4655,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    width: PropTypes.number.isRequired,
 
 	    /**
+	     * Rendering size of the row
+	     */
+	    renderWidth: PropTypes.any,
+
+	    /**
 	     * Fire when a row is clicked.
 	     */
 	    onClick: PropTypes.func,
@@ -4657,8 +4684,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  render: function render() /*object*/{
 	    var style = {
-	      width: this.props.width,
+	      width: this.props.renderWidth,
 	      height: this.props.height
+	    };
+
+	    var bodyStyle = {
+	      width: this.props.width
 	    };
 
 	    var className = cx({
@@ -4709,7 +4740,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        style: style },
 	      React.createElement(
 	        'div',
-	        { className: cx('fixedDataTableRowLayout/body') },
+	        { className: cx('fixedDataTableRowLayout/body'),
+	          style: bodyStyle },
 	        fixedColumns,
 	        scrollableColumns,
 	        columnsShadow
@@ -4801,7 +4833,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  render: function render() /*object*/{
 	    var style = {
-	      width: this.props.width,
+	      width: this.props.renderWidth,
 	      height: this.props.height,
 	      zIndex: this.props.zIndex ? this.props.zIndex : 0
 	    };

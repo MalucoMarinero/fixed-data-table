@@ -213,12 +213,15 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
   overflow: hidden;
   position: absolute;
   top: 0;
+  left: 0;
+  right: 0;
 }
 
 .fixedDataTableRowLayout_body {
-  left: 0;
-  position: absolute;
-  top: 0;
+  position: relative;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .fixedDataTableRowLayout_fixedColumnsDivider {
@@ -239,6 +242,7 @@ body[dir="rtl"] .fixedDataTableColumnResizerLineLayout_main {
 .fixedDataTableRowLayout_rowWrapper {
   position: absolute;
   top: 0;
+  width: 100%;
 }
 /**
  * Copyright (c) 2015, Facebook, Inc.

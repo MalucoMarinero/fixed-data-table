@@ -313,6 +313,10 @@ var TransitionTable = React.createClass({
     return state;
   },
 
+  sendWheelEvent(e, a, o, u, i) {
+    this.refs.newTable.sendWheelEvent(e, a, o, u, i);
+  },
+
   _checkDeprecations() {
     var needsMigration = false;
 
@@ -545,6 +549,7 @@ var TransitionTable = React.createClass({
     var props = this.props;
     return (
       <Table
+        ref="newTable"
         {...props}
         onRowMouseDown={this._onRowAction(props, props.onRowMouseDown)}
         onRowClick={this._onRowAction(props, props.onRowClick)}
