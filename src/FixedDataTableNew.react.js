@@ -184,6 +184,11 @@ var FixedDataTable = React.createClass({
     scrollTop: PropTypes.number,
 
     /**
+     * Option to center the row content using CSS.
+     */
+    centerRowContent: PropTypes.bool,
+
+    /**
      * Index of row to scroll to.
      */
     scrollToRow: PropTypes.number,
@@ -406,9 +411,14 @@ var FixedDataTable = React.createClass({
     this._reportContentHeight();
   },
 
+  sendWheelEvent(e, a, o, u, i) {
+    this._wheelHandler.onWheel(e, a, o, u, i);
+  },
+
   render() /*object*/ {
     var state = this.state;
     var props = this.props;
+    var renderWidth = props.centerRowContent ? "100%" : state.width;
 
     var groupHeader;
     if (state.useGroupHeader) {
@@ -421,6 +431,7 @@ var FixedDataTable = React.createClass({
             cx('public/fixedDataTable/header'),
           )}
           width={state.width}
+          renderWidth={renderWidth}
           height={state.groupHeaderHeight}
           index={0}
           zIndex={1}
@@ -510,6 +521,7 @@ var FixedDataTable = React.createClass({
             cx('public/fixedDataTable/footer'),
           )}
           width={state.width}
+          renderWidth={renderWidth}
           height={state.footerHeight}
           index={-1}
           zIndex={1}
@@ -531,6 +543,7 @@ var FixedDataTable = React.createClass({
           cx('public/fixedDataTable/header'),
         )}
         width={state.width}
+        renderWidth={renderWidth}
         height={state.headerHeight}
         index={-1}
         zIndex={1}
@@ -577,10 +590,10 @@ var FixedDataTable = React.createClass({
           cx('public/fixedDataTable/main'),
         )}
         onWheel={this._wheelHandler.onWheel}
-        style={{height: state.height, width: state.width}}>
+        style={{height: state.height, width: renderWidth}}>
         <div
           className={cx('fixedDataTableLayout/rowsContainer')}
-          style={{height: rowsContainerHeight, width: state.width}}>
+          style={{height: rowsContainerHeight, width: renderWidth}}>
           {dragKnob}
           {groupHeader}
           {header}
@@ -597,6 +610,7 @@ var FixedDataTable = React.createClass({
 
   _renderRows(/*number*/ offsetTop) /*object*/ {
     var state = this.state;
+    var renderWidth = this.props.centerRowContent ? "100%" : state.width;
 
     return (
       <FixedDataTableBufferedRows
@@ -620,6 +634,7 @@ var FixedDataTable = React.createClass({
         scrollableColumns={state.bodyScrollableColumns}
         showLastRowBorder={true}
         width={state.width}
+        renderWidth={renderWidth}
         rowPositionGetter={this._scrollHelper.getRowPosition}
       />
     );

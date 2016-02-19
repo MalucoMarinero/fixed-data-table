@@ -64,6 +64,11 @@ var FixedDataTableRowImpl = React.createClass({
     width: PropTypes.number.isRequired,
 
     /**
+     * Rendering size of the row
+     */
+    renderWidth: PropTypes.any,
+
+    /**
      * Fire when a row is clicked.
      */
     onClick: PropTypes.func,
@@ -88,9 +93,13 @@ var FixedDataTableRowImpl = React.createClass({
 
   render() /*object*/ {
     var style = {
-      width: this.props.width,
+      width: this.props.renderWidth,
       height: this.props.height,
     };
+
+    var bodyStyle = {
+      width: this.props.width,
+    }
 
     var className = cx({
       'fixedDataTableRowLayout/main': true,
@@ -139,7 +148,8 @@ var FixedDataTableRowImpl = React.createClass({
         onMouseEnter={this.props.onMouseEnter ? this._onMouseEnter : null}
         onMouseLeave={this.props.onMouseLeave ? this._onMouseLeave : null}
         style={style}>
-        <div className={cx('fixedDataTableRowLayout/body')}>
+        <div className={cx('fixedDataTableRowLayout/body')}
+             style={bodyStyle}>
           {fixedColumns}
           {scrollableColumns}
           {columnsShadow}
@@ -223,7 +233,7 @@ var FixedDataTableRow = React.createClass({
 
   render() /*object*/ {
     var style = {
-      width: this.props.width,
+      width: this.props.renderWidth,
       height: this.props.height,
       zIndex: (this.props.zIndex ? this.props.zIndex : 0),
     };

@@ -159,6 +159,7 @@ var FixedDataTableBufferedRows = React.createClass({
     var style = {
       position: 'absolute',
       pointerEvents: props.isScrolling ? 'none' : 'auto',
+      width: '100%',
     };
 
     translateDOMPositionXY(
