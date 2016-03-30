@@ -135,6 +135,7 @@ var FixedDataTableBufferedRows = React.createClass({
           isScrolling={props.isScrolling}
           index={rowIndex}
           width={props.width}
+          renderWidth={props.renderWidth}
           height={currentRowHeight}
           scrollLeft={Math.round(props.scrollLeft)}
           offsetTop={Math.round(rowOffsetTop)}

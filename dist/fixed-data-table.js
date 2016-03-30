@@ -1148,7 +1148,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  render: function render() /*object*/{
 	    var state = this.state;
 	    var props = this.props;
-	    var renderWidth = props.centerRowContent ? "100%" : state.width;
+	    var renderWidth = props.centerRowContent && props.rowWidth < state.width ? "100%" : state.width;
 
 	    var groupHeader;
 	    if (state.useGroupHeader) {
@@ -1156,7 +1156,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        key: 'group_header',
 	        isScrolling: this._isScrolling,
 	        className: joinClasses(cx('fixedDataTableLayout/header'), cx('public/fixedDataTable/header')),
-	        width: state.width,
+	        width: props.rowWidth,
 	        renderWidth: renderWidth,
 	        height: state.groupHeaderHeight,
 	        index: 0,
@@ -1250,7 +1250,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      key: 'header',
 	      isScrolling: this._isScrolling,
 	      className: joinClasses(cx('fixedDataTableLayout/header'), cx('public/fixedDataTable/header')),
-	      width: state.width,
+	      width: props.rowWidth,
 	      renderWidth: renderWidth,
 	      height: state.headerHeight,
 	      index: -1,
@@ -1304,7 +1304,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  _renderRows: function _renderRows( /*number*/offsetTop) /*object*/{
 	    var state = this.state;
-	    var renderWidth = this.props.centerRowContent ? "100%" : state.width;
+	    var props = this.props;
+	    var renderWidth = props.centerRowContent && props.rowWidth < state.width ? "100%" : state.width;
 
 	    return React.createElement(FixedDataTableBufferedRows, {
 	      isScrolling: this._isScrolling,
@@ -1326,7 +1327,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      scrollLeft: state.scrollX,
 	      scrollableColumns: state.bodyScrollableColumns,
 	      showLastRowBorder: true,
-	      width: state.width,
+	      width: this.props.rowWidth,
 	      renderWidth: renderWidth,
 	      rowPositionGetter: this._scrollHelper.getRowPosition
 	    });
@@ -3636,7 +3637,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 49 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/* WEBPACK VAR INJECTION */(function(global) {/**
+	/**
 	 * Copyright (c) 2015, Facebook, Inc.
 	 * All rights reserved.
 	 *
@@ -3659,7 +3660,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var translateDOMPositionXY = (function () {
 	  if (BrowserSupportCore.hasCSSTransforms()) {
-	    var ua = global.window ? global.window.navigator.userAgent : 'UNKNOWN';
+	    var ua = window ? window.navigator.userAgent : 'UNKNOWN';
 	    var isSafari = /Safari\//.test(ua) && !/Chrome\//.test(ua);
 	    // It appears that Safari messes up the composition order
 	    // of GPU-accelerated layers
@@ -3684,7 +3685,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	})();
 
 	module.exports = translateDOMPositionXY;
-	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 50 */
@@ -4007,6 +4007,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        isScrolling: props.isScrolling,
 	        index: rowIndex,
 	        width: props.width,
+	        renderWidth: props.renderWidth,
 	        height: currentRowHeight,
 	        scrollLeft: Math.round(props.scrollLeft),
 	        offsetTop: Math.round(rowOffsetTop),

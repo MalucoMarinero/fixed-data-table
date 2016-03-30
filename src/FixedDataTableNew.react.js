@@ -418,7 +418,9 @@ var FixedDataTable = React.createClass({
   render() /*object*/ {
     var state = this.state;
     var props = this.props;
-    var renderWidth = props.centerRowContent ? "100%" : state.width;
+    var renderWidth = props.centerRowContent && props.rowWidth < state.width
+      ? "100%"
+      : state.width;
 
     var groupHeader;
     if (state.useGroupHeader) {
@@ -430,7 +432,7 @@ var FixedDataTable = React.createClass({
             cx('fixedDataTableLayout/header'),
             cx('public/fixedDataTable/header'),
           )}
-          width={state.width}
+          width={props.rowWidth}
           renderWidth={renderWidth}
           height={state.groupHeaderHeight}
           index={0}
@@ -542,7 +544,7 @@ var FixedDataTable = React.createClass({
           cx('fixedDataTableLayout/header'),
           cx('public/fixedDataTable/header'),
         )}
-        width={state.width}
+        width={props.rowWidth}
         renderWidth={renderWidth}
         height={state.headerHeight}
         index={-1}
@@ -610,7 +612,10 @@ var FixedDataTable = React.createClass({
 
   _renderRows(/*number*/ offsetTop) /*object*/ {
     var state = this.state;
-    var renderWidth = this.props.centerRowContent ? "100%" : state.width;
+    var props = this.props;
+    var renderWidth = props.centerRowContent && props.rowWidth < state.width
+      ? "100%"
+      : state.width;
 
     return (
       <FixedDataTableBufferedRows
@@ -633,7 +638,7 @@ var FixedDataTable = React.createClass({
         scrollLeft={state.scrollX}
         scrollableColumns={state.bodyScrollableColumns}
         showLastRowBorder={true}
-        width={state.width}
+        width={this.props.rowWidth}
         renderWidth={renderWidth}
         rowPositionGetter={this._scrollHelper.getRowPosition}
       />
