@@ -27,7 +27,8 @@ class FixedDataTableRowBuffer {
     /*number*/ rowsCount,
     /*number*/  defaultRowHeight,
     /*number*/ viewportHeight,
-    /*?function*/ rowHeightGetter
+    /*?function*/ rowHeightGetter,
+    /*boolean*/ isCrawler
   ) {
     invariant(
       defaultRowHeight !== 0,
@@ -38,12 +39,10 @@ class FixedDataTableRowBuffer {
     this._defaultRowHeight = defaultRowHeight;
     this._viewportRowsBegin = 0;
     this._viewportRowsEnd = 0;
-    this._maxVisibleRowCount = Math.ceil(viewportHeight / defaultRowHeight) + 1;
-    this._bufferRowsCount = clamp(
-      Math.floor(this._maxVisibleRowCount/2),
-      MIN_BUFFER_ROWS,
-      MAX_BUFFER_ROWS
-    );
+
+    this._maxVisibleRowCount = typeof window === 'undefined' && isCrawler ? 99999 : Math.ceil(viewportHeight / defaultRowHeight) + 1;
+    this._bufferRowsCount = typeof window === 'undefined' && isCrawler  ? 99999 : clamp(Math.floor(this._maxVisibleRowCount / 2), MIN_BUFFER_ROWS, MAX_BUFFER_ROWS);
+
     this._rowsCount = rowsCount;
     this._rowHeightGetter = rowHeightGetter;
     this._rows = [];
