@@ -647,7 +647,7 @@ var FixedDataTable = React.createClass({
         width={this.props.rowWidth}
         renderWidth={renderWidth}
         rowPositionGetter={this._scrollHelper.getRowPosition}
-        isCrawler={this.prps.isCrawler}
+        isCrawler={this.props.isCrawler}
       />
     );
   },
