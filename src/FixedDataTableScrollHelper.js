@@ -28,8 +28,8 @@ class FixedDataTableScrollHelper {
     /*number*/ rowCount,
     /*number*/ defaultRowHeight,
     /*number*/ viewportHeight,
-    /*?function*/ rowHeightGetter
-    /*?number*/ maxScroll,
+    /*?function*/ rowHeightGetter,
+    /*?number*/ maxScroll
   ) {
     this._rowOffsets = PrefixIntervalTree.uniform(rowCount, defaultRowHeight);
     this._storedHeights = new Array(rowCount);

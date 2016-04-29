@@ -870,6 +870,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    maxHeight: PropTypes.number,
 
 	    /**
+	     * Maximum number of pixels the table is allowed to scroll, optional
+	     */
+	    maxScroll: PropTypes.number,
+
+	    /**
 	     * Pixel height of table's owner, this is used in a managed scrolling
 	     * situation when you want to slide the table up from below the fold
 	     * without having to constantly update the height on every scroll tick.
@@ -1040,7 +1045,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getInitialState: function getInitialState() /*object*/{
 	    var props = this.props;
 	    var viewportHeight = this.getViewportHeightFromProps(props);
-	    this._scrollHelper = new FixedDataTableScrollHelper(props.rowsCount, props.rowHeight, viewportHeight, props.rowHeightGetter);
+	    this._scrollHelper = new FixedDataTableScrollHelper(props.rowsCount, props.rowHeight, viewportHeight, props.rowHeightGetter, props.maxScroll);
 	    if (props.scrollTop) {
 	      this._scrollHelper.scrollTo(props.scrollTop);
 	    }
@@ -1329,7 +1334,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      showLastRowBorder: true,
 	      width: this.props.rowWidth,
 	      renderWidth: renderWidth,
-	      rowPositionGetter: this._scrollHelper.getRowPosition
+	      rowPositionGetter: this._scrollHelper.getRowPosition,
+	      isCrawler: this.prps.isCrawler
 	    });
 	  },
 
@@ -1485,7 +1491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // Number of rows changed, try to scroll to the row from before the
 	      // change
 	      var viewportHeight = this.getViewportHeightFromProps(props);
-	      this._scrollHelper = new FixedDataTableScrollHelper(props.rowsCount, props.rowHeight, viewportHeight, props.rowHeightGetter);
+	      this._scrollHelper = new FixedDataTableScrollHelper(props.rowsCount, props.rowHeight, viewportHeight, props.rowHeightGetter, props.maxScroll);
 	      var scrollState = this._scrollHelper.scrollToRow(firstRowIndex, firstRowOffset);
 	      firstRowIndex = scrollState.index;
 	      firstRowOffset = scrollState.offset;
@@ -3941,7 +3947,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  },
 
 	  getInitialState: function getInitialState() /*object*/{
-	    this._rowBuffer = new FixedDataTableRowBuffer(this.props.rowsCount, this.props.defaultRowHeight, this.props.height, this._getRowHeight);
+	    this._rowBuffer = new FixedDataTableRowBuffer(this.props.rowsCount, this.props.defaultRowHeight, this.props.height, this._getRowHeight, this.props.isCrawler);
 	    return {
 	      rowsToRender: this._rowBuffer.getRows(this.props.firstRowIndex, this.props.firstRowOffset)
 	    };
@@ -3959,7 +3965,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  componentWillReceiveProps: function componentWillReceiveProps( /*object*/nextProps) {
 	    if (nextProps.rowsCount !== this.props.rowsCount || nextProps.defaultRowHeight !== this.props.defaultRowHeight || nextProps.height !== this.props.height) {
-	      this._rowBuffer = new FixedDataTableRowBuffer(nextProps.rowsCount, nextProps.defaultRowHeight, nextProps.height, this._getRowHeight);
+	      this._rowBuffer = new FixedDataTableRowBuffer(nextProps.rowsCount, nextProps.defaultRowHeight, nextProps.height, this._getRowHeight, this.props.isCrawler);
 	    }
 	    if (this.props.isScrolling && !nextProps.isScrolling) {
 	      this._updateBuffer();
@@ -4087,7 +4093,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /*number*/rowsCount,
 	  /*number*/defaultRowHeight,
 	  /*number*/viewportHeight,
-	  /*?function*/rowHeightGetter) {
+	  /*?function*/rowHeightGetter,
+	  /*boolean*/isCrawler) {
 	    _classCallCheck(this, FixedDataTableRowBuffer);
 
 	    invariant(defaultRowHeight !== 0, "defaultRowHeight musn't be equal 0 in FixedDataTableRowBuffer");
@@ -4096,8 +4103,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    this._defaultRowHeight = defaultRowHeight;
 	    this._viewportRowsBegin = 0;
 	    this._viewportRowsEnd = 0;
-	    this._maxVisibleRowCount = Math.ceil(viewportHeight / defaultRowHeight) + 1;
-	    this._bufferRowsCount = clamp(Math.floor(this._maxVisibleRowCount / 2), MIN_BUFFER_ROWS, MAX_BUFFER_ROWS);
+
+	    this._maxVisibleRowCount = typeof window === 'undefined' && isCrawler ? 99999 : Math.ceil(viewportHeight / defaultRowHeight) + 1;
+	    this._bufferRowsCount = typeof window === 'undefined' && isCrawler ? 99999 : clamp(Math.floor(this._maxVisibleRowCount / 2), MIN_BUFFER_ROWS, MAX_BUFFER_ROWS);
+
 	    this._rowsCount = rowsCount;
 	    this._rowHeightGetter = rowHeightGetter;
 	    this._rows = [];
@@ -5838,7 +5847,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /*number*/rowCount,
 	  /*number*/defaultRowHeight,
 	  /*number*/viewportHeight,
-	  /*?function*/rowHeightGetter) {
+	  /*?function*/rowHeightGetter,
+	  /*?number*/maxScroll) {
 	    _classCallCheck(this, FixedDataTableScrollHelper);
 
 	    this._rowOffsets = PrefixIntervalTree.uniform(rowCount, defaultRowHeight);
@@ -5847,6 +5857,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      this._storedHeights[i] = defaultRowHeight;
 	    }
 	    this._rowCount = rowCount;
+	    this._maxScroll = maxScroll;
 	    this._position = 0;
 	    this._contentHeight = rowCount * defaultRowHeight;
 	    this._defaultRowHeight = defaultRowHeight;
@@ -5981,7 +5992,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        }
 	      }
 
-	      var maxPosition = this._contentHeight - this._viewportHeight;
+	      var maxPosition = this._maxScroll !== undefined ? this._maxScroll : this._contentHeight - this._viewportHeight;
 	      position = clamp(position, 0, maxPosition);
 	      this._position = position;
 	      var firstRowIndex = this._rowOffsets.greatestLowerBound(position);
