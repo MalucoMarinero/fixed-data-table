@@ -960,6 +960,7 @@ var FixedDataTable = React.createClass({
     }
 
     this._scrollHelper.setViewportHeight(bodyHeight);
+    this._scrollHelper.setMaxScroll(props.maxScroll);
 
     // The order of elements in this object metters and bringing bodyHeight,
     // height or useGroupHeader to the top can break various features

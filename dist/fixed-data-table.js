@@ -1589,6 +1589,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    this._scrollHelper.setViewportHeight(bodyHeight);
+	    this._scrollHelper.setMaxScroll(props.maxScroll);
 
 	    // The order of elements in this object metters and bringing bodyHeight,
 	    // height or useGroupHeader to the top can break various features
@@ -5886,6 +5887,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'setViewportHeight',
 	    value: function setViewportHeight( /*number*/viewportHeight) {
 	      this._viewportHeight = viewportHeight;
+	    }
+	  }, {
+	    key: 'setMaxScroll',
+	    value: function setMaxScroll( /*number*/maxScroll) {
+	      this._maxScroll = maxScroll;
 	    }
 	  }, {
 	    key: 'getContentHeight',

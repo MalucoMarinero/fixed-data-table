@@ -65,6 +65,10 @@ class FixedDataTableScrollHelper {
     this._viewportHeight = viewportHeight;
   }
 
+  setMaxScroll(/*number*/ maxScroll) {
+    this._maxScroll = maxScroll;
+  }
+
   getContentHeight() /*number*/ {
     return this._contentHeight;
   }
