@@ -29,6 +29,7 @@ class FixedDataTableScrollHelper {
     /*number*/ defaultRowHeight,
     /*number*/ viewportHeight,
     /*?function*/ rowHeightGetter
+    /*?number*/ maxScroll,
   ) {
     this._rowOffsets = PrefixIntervalTree.uniform(rowCount, defaultRowHeight);
     this._storedHeights = new Array(rowCount);
@@ -36,6 +37,7 @@ class FixedDataTableScrollHelper {
       this._storedHeights[i] = defaultRowHeight;
     }
     this._rowCount = rowCount;
+    this._maxScroll = maxScroll;
     this._position = 0;
     this._contentHeight = rowCount * defaultRowHeight;
     this._defaultRowHeight = defaultRowHeight;
@@ -163,7 +165,9 @@ class FixedDataTableScrollHelper {
       }
     }
 
-    var maxPosition = this._contentHeight - this._viewportHeight;
+    var maxPosition = this._maxScroll !== undefined
+      ? this._maxScroll
+      : this._contentHeight - this._viewportHeight;
     position = clamp(position, 0, maxPosition);
     this._position = position;
     var firstRowIndex = this._rowOffsets.greatestLowerBound(position);

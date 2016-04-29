@@ -113,6 +113,11 @@ var FixedDataTable = React.createClass({
     maxHeight: PropTypes.number,
 
     /**
+     * Maximum number of pixels the table is allowed to scroll, optional
+     */
+    maxScroll: PropTypes.number,
+
+    /**
      * Pixel height of table's owner, this is used in a managed scrolling
      * situation when you want to slide the table up from below the fold
      * without having to constantly update the height on every scroll tick.
@@ -292,7 +297,8 @@ var FixedDataTable = React.createClass({
       props.rowsCount,
       props.rowHeight,
       viewportHeight,
-      props.rowHeightGetter
+      props.rowHeightGetter,
+      props.maxScroll
     );
     if (props.scrollTop) {
       this._scrollHelper.scrollTo(props.scrollTop);
@@ -833,7 +839,8 @@ var FixedDataTable = React.createClass({
         props.rowsCount,
         props.rowHeight,
         viewportHeight,
-        props.rowHeightGetter
+        props.rowHeightGetter,
+        props.maxScroll
       );
       var scrollState =
         this._scrollHelper.scrollToRow(firstRowIndex, firstRowOffset);
